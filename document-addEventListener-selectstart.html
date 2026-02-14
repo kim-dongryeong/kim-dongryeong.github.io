@@ -2,7 +2,7 @@
 <html>
 <body>
 <script>
-window.addEventListener("selectstart", e => {
+document.addEventListener("selectstart", e => {
   e.preventDefault();
   console.log('selectstart is disabled in https://kim-dongryeong.github.io/');
 }, true);
@@ -12,7 +12,7 @@ window.addEventListener("selectstart", e => {
 <h1 style="user-select:none;">🌈 Good day! 🦄</h1>
 
 <p>User select disabled, 'selectstart' is blocked.</p>
-<p>window.addEventListener("selectstart", e => e.preventDefault(), true);</p>
+<p>document.addEventListener("selectstart", e => e.preventDefault(), true);</p>
 
 </body>
 </html>
