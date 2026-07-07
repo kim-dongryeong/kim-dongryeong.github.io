@@ -1,18 +1,274 @@
-<!DOCTYPE html><html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Session Search — search your Claude Code, Codex & Gemini history</title>
+<meta name="description" content="A local, read-only, zero-dependency viewer and full-text search for your Claude Code, Codex, and Gemini CLI transcripts — the only one that knows which words were actually yours. Free & open-source.">
+<meta name="theme-color" content="#1061b7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201024%201024'%3E%3Cdefs%3E%3ClinearGradient%20id='g'%20x1='0'%20y1='0'%20x2='1'%20y2='1'%3E%3Cstop%20offset='0'%20stop-color='%230084ff'/%3E%3Cstop%20offset='.52'%20stop-color='%231061b7'/%3E%3Cstop%20offset='.93'%20stop-color='%23b0ff29'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='100'%20y='100'%20width='824'%20height='824'%20rx='180'%20fill='url(%23g)'/%3E%3Ctext%20x='512'%20y='690'%20font-family='Helvetica,Arial'%20font-size='560'%20font-weight='700'%20fill='%23fff'%20text-anchor='middle'%3EAI%3C/text%3E%3C/svg%3E">
+<!-- social share -->
+<meta property="og:title" content="AI Session Search">
+<meta property="og:description" content="Search everything you and your AI coding agents have ever done — and let your next agent look it up. Local, read-only, zero-dependency. Claude Code · Codex · Gemini.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kim-dongryeong.github.io/">
+<meta property="og:image" content="https://kim-dongryeong.github.io/assets/hero-session.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Session Search">
+<meta name="twitter:description" content="The local, read-only search engine for your Claude Code / Codex / Gemini history that knows which words were actually yours.">
+<meta name="twitter:image" content="https://kim-dongryeong.github.io/assets/hero-session.png">
+<style>
+:root{
+  --ink:#12203a; --ink-2:#4a5568; --bg:#f6f8fc; --card:#ffffff; --line:#e4e9f2;
+  --brand:#1061b7; --brand-2:#0084ff; --accent:#8a9dff; --radius:16px;
+  --grad: radial-gradient(1200px circle at 8% 14%, rgba(138,157,255,.95), rgba(138,157,255,0) 55%),
+          radial-gradient(1100px circle at 88% 82%, rgba(105,245,247,.85), rgba(105,245,247,0) 55%),
+          linear-gradient(20deg,#0084ff 0%, #1061b7 42%, #7bd23a 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ink:#e8ecf3; --ink-2:#a3adbd; --bg:#0e1016; --card:#171a22; --line:#262b36; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,'Apple SD Gothic Neo',sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+h1,h2,h3{line-height:1.15;letter-spacing:-.02em}
+img{max-width:100%;display:block}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.6) blur(12px);-webkit-backdrop-filter:saturate(1.6) blur(12px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink)}
+.brand:hover{text-decoration:none}
+.brand .logo{width:30px;height:30px;border-radius:9px;box-shadow:0 3px 10px rgba(16,20,60,.25)}
+.nav .sp{flex:1}
+.nav a.nl{color:var(--ink-2);font-size:14.5px;font-weight:500}
+.nav a.nl:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:11px 20px;font-weight:650;font-size:15px;cursor:pointer;border:1px solid transparent;transition:transform .12s ease, box-shadow .12s ease}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 8px 22px rgba(16,97,183,.35)}
+.btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.btn-line{background:var(--card);color:var(--ink);border-color:var(--line)}
+.nav .btn{padding:8px 16px;font-size:14px}
+@media(max-width:720px){.nav a.nl{display:none}}
+
+/* hero */
+.hero{position:relative;color:#fff;background:var(--grad);overflow:hidden}
+.hero .wrap{padding:64px 22px 56px;text-align:center}
+.hlogo{width:78px;height:78px;border-radius:22px;margin:0 auto 22px;box-shadow:0 18px 44px rgba(8,20,70,.4)}
+.hero h1{font-size:clamp(30px,5.4vw,52px);margin:0 0 14px;text-shadow:0 2px 18px rgba(8,25,80,.25)}
+.hero .sub{font-size:clamp(16px,2.4vw,20px);max-width:720px;margin:0 auto 12px;color:rgba(255,255,255,.94)}
+.hero .sub b{color:#fff}
+.hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:26px 0 14px}
+.hero .try{font-size:13.5px;color:rgba(255,255,255,.9)}
+.hero .try code{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:3px 9px}
+.pill-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.pill{font-size:12.5px;font-weight:600;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:6px 13px;color:#fff}
+
+/* browser frame */
+.frame{max-width:960px;margin:34px auto -70px;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(6,18,64,.45);border:1px solid rgba(255,255,255,.25)}
+.frame .bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:#e9edf5}
+.frame .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.frame .bar img{border-radius:0}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.frame .addr{flex:1;text-align:center;font-size:12px;color:#8a94a6;background:#fff;border-radius:6px;padding:4px 10px;margin-left:8px}
+
+/* sections */
+section{padding:96px 0}
+.eyebrow{color:var(--brand);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px}
+h2{font-size:clamp(26px,3.6vw,36px);margin:0 0 14px}
+.lead{font-size:18px;color:var(--ink-2);max-width:760px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.split img{border-radius:14px;border:1px solid var(--line);box-shadow:0 16px 44px rgba(20,40,90,.14)}
+@media(max-width:860px){.split{grid-template-columns:1fr;gap:26px}.split.rev>div:first-child{order:2}}
+.big-note{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 12%,var(--bg)),var(--bg));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:color-mix(in srgb,var(--ink) 8%,transparent);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+
+/* feature grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.fcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.fcard .ic{font-size:26px}
+.fcard h3{font-size:18px;margin:12px 0 8px}
+.fcard p{color:var(--ink-2);font-size:14.5px;margin:0}
+
+/* code block */
+.code{background:#0d1220;color:#e6edf7;border-radius:14px;padding:20px 22px;overflow-x:auto;font-family:ui-monospace,Menlo,monospace;font-size:13.5px;line-height:1.75;border:1px solid #1d2740}
+.code .c{color:#7b8aa3}.code .g{color:#7ee0a0}.code .b{color:#7fb0ff}
+
+/* download */
+.dl{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:34px}
+@media(max-width:860px){.dl{grid-template-columns:1fr}}
+.oscard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;text-align:center}
+.oscard .os{font-size:34px}
+.oscard h3{margin:10px 0 4px;font-size:18px}
+.oscard p{color:var(--ink-2);font-size:13px;margin:0 0 16px;min-height:34px}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:44px 0;color:var(--ink-2);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer a{color:var(--ink-2)}
+.center{text-align:center}
+</style>
+</head>
 <body>
-<script>
-window.addEventListener("selectstart", e => {
-  e.preventDefault();
-  console.log('💥 [selectstart] is disabled in ♐︎😼🐙 kim-dongryeong.github.io');
-}, true);
-console.log('💣 [selectstart] preventDefault() is registered in ♐︎😼🐙 kim-dongryeong.github.io');
-</script>
-<h1 style="user-select: none !important;">🌈 Good day! 🦄 (user-select: none !important)</h1>
-<p style="user-select: none;">User select disabled, 'selectstart' is blocked. (user-select: none)</p>
-<p>window.addEventListener("selectstart", e => e.preventDefault(), true);</p>
-</body></html>
 
+<!-- inline brand gradient logo (reused via <use>) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="ai-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0084ff"/><stop offset=".52" stop-color="#1061b7"/><stop offset=".93" stop-color="#b0ff29"/></linearGradient>
+<radialGradient id="ai-p" cx=".38" cy=".2" r=".7"><stop offset="0" stop-color="rgb(169,138,255)"/><stop offset="1" stop-color="rgba(169,138,255,0)"/></radialGradient>
+<symbol id="ai-logo" viewBox="0 0 1024 1024">
+  <rect x="100" y="100" width="824" height="824" rx="180" fill="url(#ai-g)"/>
+  <rect x="100" y="100" width="824" height="824" rx="180" fill="url(#ai-p)"/>
+  <text x="512" y="560" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="560" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">AI</text>
+</symbol></defs></svg>
 
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="#top"><svg class="logo"><use href="#ai-logo"/></svg> AI Session Search</a>
+  <span class="sp"></span>
+  <a class="nl" href="#insight">Why</a>
+  <a class="nl" href="#features">Features</a>
+  <a class="nl" href="#agents">For agents</a>
+  <a class="nl" href="#download">Download</a>
+  <a class="btn btn-line" href="https://github.com/kim-dongryeong/ai-session-search">GitHub ↗</a>
+</div></nav>
 
+<header class="hero" id="top"><div class="wrap">
+  <svg class="hlogo"><use href="#ai-logo"/></svg>
+  <h1>Search everything you and your<br>AI coding agents have ever done.</h1>
+  <p class="sub">A <b>local, read-only, zero-dependency</b> viewer &amp; full-text search for your
+    <b>Claude&nbsp;Code</b>, <b>Codex</b> &amp; <b>Gemini&nbsp;CLI</b> history — and the only one that
+    knows which words were <b>actually yours</b>.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://github.com/kim-dongryeong/ai-session-search/releases/latest">⬇ Download for macOS · Windows · Linux</a>
+    <a class="btn btn-ghost" href="https://github.com/kim-dongryeong/ai-session-search">★ Star on GitHub</a>
+  </div>
+  <p class="try">or <code class="mono">pipx install ai-session-search &amp;&amp; aiss --demo</code></p>
+  <div class="pill-row">
+    <span class="pill">🔒 100% local</span>
+    <span class="pill">👁 read-only</span>
+    <span class="pill">📦 zero dependencies</span>
+    <span class="pill">🤖 MCP · CLI · API</span>
+    <span class="pill">⚖️ GPL-3.0</span>
+  </div>
+  <div class="frame">
+    <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i>
+      <span class="addr">127.0.0.1:8777 — AI Session Search</span></div>
+    <img src="assets/demo.gif" alt="Keyboard-driven tour of AI Session Search" loading="lazy">
+  </div>
+</div></header>
 
+<div style="height:90px"></div>
 
+<section id="insight" class="big-note"><div class="wrap">
+  <p class="eyebrow">The insight</p>
+  <div class="split">
+    <div>
+      <h2>Most <span class="kbd">role: "user"</span> lines in your transcripts aren't you.</h2>
+      <p class="lead">Open any Claude&nbsp;Code, Codex, or Gemini log and nearly everything is tagged
+        <span class="kbd">role:&nbsp;user</span>. But <b>~95% of it is machine noise</b> — tool results,
+        injected IDE context, system reminders, task-notifications, subagent briefs. Every other viewer
+        shows them as if you typed them.</p>
+      <p class="lead" style="margin-top:14px">AI Session Search uses an <b>empirically audited, adversarially
+        verified</b> ruleset per provider, so only text a human really typed is marked <b>🧑&nbsp;You</b>.
+        That one fix is what makes search, reading, and agent recall land on <b>real intent</b>.</p>
+    </div>
+    <div><img src="assets/hero-session.png" alt="A session with correct human-vs-machine attribution, tool blocks and diffs"></div>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <p class="eyebrow center" style="text-align:center">Feature tour</p>
+  <h2 class="center" style="text-align:center">Everything, searchable — nothing uploaded.</h2>
+
+  <div class="split" style="margin-top:48px">
+    <div><img src="assets/search.png" alt="Full-text search with per-term highlighting across turns"></div>
+    <div>
+      <h3 style="font-size:22px">🔎 Search that actually finds things</h3>
+      <p class="lead">Relevance-ranked, per-term color highlighting, matching within a turn, across nearby
+        turns, or anywhere in a session. Searches message text, tool-call args, and <b>code bodies</b>.
+        Field queries: <span class="kbd">file:</span> <span class="kbd">cmd:</span>
+        <span class="kbd">code:</span> <span class="kbd">error:</span> <span class="kbd">role:me</span>
+        <span class="kbd">id:</span>, plus <span class="kbd">-exclude</span> and <span class="kbd">"phrases"</span>.</p>
+    </div>
+  </div>
+
+  <div class="split rev" style="margin-top:64px">
+    <div>
+      <h3 style="font-size:22px">🗂️ Claude, Codex &amp; Gemini in one place</h3>
+      <p class="lead">Auto-discovers all three, each parsed with the same attribution rigor and shown with a
+        provider badge, model mix, token totals, and a resume command. Grouped by workspace, with sortable
+        per-project stats.</p>
+    </div>
+    <div><img src="assets/provider-codex.png" alt="Codex sessions with project stats and model mix"></div>
+  </div>
+
+  <div class="grid">
+    <div class="fcard"><div class="ic">🧩</div><h3>Code &amp; diff extraction</h3>
+      <p>“Code only” re-gathers every generated block and file edit — yours and the agent's — with context and one-click copy.</p></div>
+    <div class="fcard"><div class="ic">⌨️</div><h3>Keyboard-first</h3>
+      <p>Gmail-style <span class="kbd">j</span>/<span class="kbd">k</span>/<span class="kbd">n</span>/<span class="kbd">p</span>, filter chips on digit keys, <span class="kbd">/</span> to search, <span class="kbd">?</span> for the map.</p></div>
+    <div class="fcard"><div class="ic">🌓</div><h3>Dark mode &amp; i18n</h3>
+      <p>Light/dark, a live language switcher, Korean built in, and any locale you add with no rebuild.</p></div>
+    <div class="fcard"><div class="ic">📊</div><h3>Facts, not fluff</h3>
+      <p>Deterministic digests: files touched, commands, tests, commits, PR links — no LLM, no guessing.</p></div>
+    <div class="fcard"><div class="ic">⭐</div><h3>Durable stars</h3>
+      <p>Bookmarks saved to a local file with export/import, so they survive a machine change.</p></div>
+    <div class="fcard"><div class="ic">🤖</div><h3>Subagent threads</h3>
+      <p>Sidechain / Task / workflow transcripts listed per session; orchestrator briefs never mislabelled as you.</p></div>
+  </div>
+</div></section>
+
+<section id="agents" class="big-note"><div class="wrap">
+  <p class="eyebrow">For coding agents</p>
+  <h2>Your past sessions are a memory your agent doesn't have.</h2>
+  <p class="lead" style="margin-bottom:26px">The same search engine is exposed four ways so your next agent can look up
+    <i>how you actually solved something before</i> — over faithful transcripts, with correct attribution,
+    <b>no embeddings, no database, no indexing step</b>. All local, all read-only.</p>
+  <div class="split">
+    <div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:0">
+        <div class="fcard"><h3>🔌 MCP server</h3><p><span class="kbd">aiss --mcp</span> — stdio JSON-RPC. <span class="kbd">search_sessions</span>, <span class="kbd">get_session</span>, <span class="kbd">list_recent_sessions</span>.</p></div>
+        <div class="fcard"><h3>⌨️ CLI</h3><p>One-shot <span class="kbd">aiss --search</span> / <span class="kbd">--get</span> / <span class="kbd">--sessions</span> (<span class="kbd">--json</span>) — a perfect Bash tool.</p></div>
+        <div class="fcard"><h3>🌐 JSON API</h3><p><span class="kbd">/api/search</span>, <span class="kbd">/api/session</span>, <span class="kbd">/api/sessions</span> on the local server.</p></div>
+        <div class="fcard"><h3>🧠 Skill</h3><p>A drop-in skill that teaches an agent <i>when</i> to recall past work before re-solving it.</p></div>
+      </div>
+    </div>
+    <div class="code">
+<span class="c"># give Claude Code a memory of everything you've built</span>
+claude mcp add ai-session-search -- aiss --mcp
+
+<span class="c"># or from any agent's Bash tool</span>
+aiss --search <span class="g">'role:me redis rate limit'</span> --json
+aiss --search <span class="g">'cmd:pyinstaller notarize'</span> --scope tool
+aiss --get <span class="b">&lt;session-id&gt;</span>
+    </div>
+  </div>
+</div></section>
+
+<section id="download"><div class="wrap center">
+  <p class="eyebrow" style="text-align:center">Download</p>
+  <h2 style="text-align:center">Free, open-source, and it runs on your machine.</h2>
+  <p class="lead" style="margin:0 auto">Grab a build, double-click, and it opens in your browser. Nothing is uploaded — ever.</p>
+  <div class="dl">
+    <div class="oscard"><div class="os">🍎</div><h3>macOS</h3><p>Apple Silicon &amp; Intel · signed &amp; notarized <span class="mono">.dmg</span></p>
+      <a class="btn btn-primary" href="https://github.com/kim-dongryeong/ai-session-search/releases/latest">Download .dmg</a></div>
+    <div class="oscard"><div class="os">🪟</div><h3>Windows</h3><p>A single <span class="mono">.exe</span> — download and double-click.</p>
+      <a class="btn btn-primary" href="https://github.com/kim-dongryeong/ai-session-search/releases/latest">Download .exe</a></div>
+    <div class="oscard"><div class="os">🐧</div><h3>Linux</h3><p>Self-contained <span class="mono">.tar.gz</span> binary.</p>
+      <a class="btn btn-primary" href="https://github.com/kim-dongryeong/ai-session-search/releases/latest">Download .tar.gz</a></div>
+  </div>
+  <p style="margin-top:30px;color:var(--ink-2)">Have Python? <code class="mono">pipx install ai-session-search</code> then
+    <code class="mono">aiss --demo</code>. &nbsp;·&nbsp; <a href="https://github.com/kim-dongryeong/ai-session-search">Full docs on GitHub ↗</a></p>
+</div></section>
+
+<footer><div class="wrap">
+  <div><a class="brand" href="https://github.com/kim-dongryeong/ai-session-search" style="color:var(--ink)"><svg class="logo" style="width:24px;height:24px"><use href="#ai-logo"/></svg> AI Session Search</a></div>
+  <div>Free &amp; open-source · <a href="https://github.com/kim-dongryeong/ai-session-search/blob/main/LICENSE">GPL-3.0</a> · built by <a href="https://github.com/kim-dongryeong">@kim-dongryeong</a> · <a href="https://github.com/kim-dongryeong/ai-session-search">GitHub</a></div>
+</div></footer>
+
+</body>
+</html>
