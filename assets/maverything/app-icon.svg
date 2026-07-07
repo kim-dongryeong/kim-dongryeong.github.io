@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="emBase" x1="120" y1="100" x2="910" y2="950" gradientUnits="userSpaceOnUse" gradientTransform="translate(1024,0) scale(-1,1)">
+      <stop offset="0" stop-color="#0C6E5F"/><stop offset="0.52" stop-color="#10B981"/><stop offset="1" stop-color="#A6E635"/>
+    </linearGradient>
+    <radialGradient id="emGlowA" cx="0.75" cy="0.22" r="0.72"><stop offset="0" stop-color="#8CF5D2" stop-opacity="0.85"/><stop offset="1" stop-color="#8CF5D2" stop-opacity="0"/></radialGradient>
+    <radialGradient id="emGlowB" cx="0.16" cy="0.86" r="0.68"><stop offset="0" stop-color="#D4F76A" stop-opacity="0.7"/><stop offset="1" stop-color="#D4F76A" stop-opacity="0"/></radialGradient>
+    <filter id="emShadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow xmlns="http://www.w3.org/2000/svg" flood-opacity="0.55" flood-color="#0A4A3E" stdDeviation="20" dy="14" dx="0"/></filter>
+    <clipPath id="emClip"><rect x="100" y="100" width="824" height="824" rx="180"/></clipPath>
+
+    <!-- glyph effects: shadow + slight emboss + faint glow + slight transparency -->
+    <filter id="glyphFX" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">
+      <!-- soft drop shadow (lifts the glyph off the emerald) -->
+      <feGaussianBlur in="SourceAlpha" stdDeviation="11" result="shb"/>
+      <feOffset in="shb" dx="0" dy="10" result="sho"/>
+      <feFlood xmlns="http://www.w3.org/2000/svg" result="shc" flood-opacity="0.50" flood-color="#04352C"/>
+      <feComposite in="shc" in2="sho" operator="in" result="shadow"/>
+      <!-- very faint mint glow behind the glyph -->
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="glb"/>
+      <feFlood xmlns="http://www.w3.org/2000/svg" result="glc" flood-opacity="0.5" flood-color="#CFFFEE"/>
+      <feComposite in="glc" in2="glb" operator="in" result="glow"/>
+      <!-- slight transparency on the white body -->
+      <feComponentTransfer in="SourceGraphic" result="body">
+        <feFuncA type="linear" slope="0.93"/>
+      </feComponentTransfer>
+      <!-- emboss lowlight: dark rim on the lower-right (bevel depth) -->
+      <feOffset result="ioff" dy="-5" dx="-5" in="SourceAlpha"/>
+      <feComposite in="SourceAlpha" in2="ioff" operator="out" result="irim"/>
+      <feGaussianBlur in="irim" stdDeviation="4" result="irimb"/>
+      <feFlood xmlns="http://www.w3.org/2000/svg" result="icol" flood-opacity="0.55" flood-color="#0A4A3E"/>
+      <feComposite in="icol" in2="irimb" operator="in" result="lowlight"/>
+      <!-- emboss highlight: bright specular along the top edges -->
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="beb"/>
+      <feSpecularLighting in="beb" surfaceScale="6" specularConstant="0.95" specularExponent="22" lighting-color="#ffffff" result="spec">
+        <feDistantLight azimuth="235" elevation="58"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specClip"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="body"/>
+        <feMergeNode in="lowlight"/>
+        <feMergeNode in="specClip"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="100" y="100" width="824" height="824" rx="180" fill="url(#emBase)" filter="url(#emShadow)"/>
+  <g clip-path="url(#emClip)"><rect x="100" y="100" width="824" height="824" fill="url(#emGlowA)"/><rect x="100" y="100" width="824" height="824" fill="url(#emGlowB)"/></g>
+
+  <g transform="translate(1024,0) scale(-1,1)">
+    <g filter="url(#glyphFX)">
+      <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M436 350C352 350 336 430 420 450C504 470 488 550 404 550" stroke-width="52"/>
+      </g>
+      <g fill="none" stroke="#FFFFFF" stroke-linecap="round"><circle cx="448" cy="448" r="196" stroke-width="90"/><line x1="600" y1="600" x2="770" y2="778" stroke-width="90"/></g>
+    </g>
+  </g>
+</svg>
